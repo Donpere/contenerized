@@ -1,0 +1,77 @@
+Un exemple simple pourrait ressembler à ceci dans le fichier de configuration Nginx :
+
+server {
+    listen 80;
+    server_name votresite.local;  # Remplacez par le nom de domaine ou l'adresse IP de votre choix
+
+    location / {
+        root /chemin/vers/votre/site;
+        index index.html;
+    }
+
+    # Autres directives Nginx...
+}
+- - - - - - - - - - - - - - - - - - - - - - - - -
+
+Dans cet exemple :
+PORT :
+listen 80; indique que Nginx doit écouter les requêtes sur le port 80.
+server_name est le nom de domaine ou l'adresse IP associé à votre site.
+
+LOCALHOST : ip exemple 127.0.0.1
+Si vous accédez à http://localhost dans votre navigateur, Nginx servira le contenu de votre site à partir du répertoire spécifié. Vous pouvez également utiliser l'adresse IP 127.0.0.1 à la place de localhost dans la directive server_name.
+
+location / 
+spécifie que les requêtes à la racine du site (/) doivent être gérées par les directives suivantes.
+
+root /chemin/vers/votre/site; 
+définit le répertoire racine où se trouvent les fichiers de votre site.
+index index.html; indique que Nginx doit servir le fichier index.html lorsque la racine du site est demandée.
+Dans cet exemple, le chemin /chemin/vers/votre/site est relatif au répertoire de travail de Nginx. Si le répertoire de travail de Nginx est /usr/share/nginx, alors le chemin complet vers le répertoire du site serait /usr/share/nginx/chemin/vers/votre/site.
+
+
+/usr/share/nginx
+|-- chemin
+|   `-- vers
+|       `-- votre
+|           `-- site
+|               |-- index.html
+|               `-- autres_fichiers.html
+|-- autre_repertoire
+|-- ...
+Lorsqu'une requête est faite à votre serveur Nginx pour http://localhost/, Nginx cherchera le fichier index.html dans le répertoire spécifié par la directive root, c'est-à-dire /usr/share/nginx/chemin/vers/votre/site.
+
+Si vous souhaitez servir un fichier spécifique comme http://localhost/monfichier.html, Nginx cherchera le fichier /usr/share/nginx/chemin/vers/votre/site/monfichier.html. Vous pouvez ajuster le chemin dans la directive root en fonction de la structure de votre projet et de l'emplacement réel des fichiers de votre site.
+
+Le répertoire de travail de Nginx est généralement défini dans le fichier de configuration principal, souvent appelé nginx.conf. Pour trouver le répertoire de travail, vous pouvez utiliser la commande nginx -t pour tester la configuration et afficher des informations, y compris le chemin du fichier de configuration et le répertoire de travail. Voici comment vous pouvez le faire :
+
+Utiliser la commande nginx -t :
+
+Exécutez la commande suivante dans votre terminal :
+
+nginx -t
+Cette commande teste la configuration de Nginx et affiche des informations sur la configuration, y compris le chemin du fichier de configuration et le répertoire de travail.
+
+Si vous ne pouvez pas exécuter directement la commande nginx -t, essayez avec sudo si vous avez besoin de permissions élevées :
+
+bash
+Copy code
+sudo nginx -t
+Analyser la sortie :
+
+La sortie de la commande inclura des informations sur le fichier de configuration et le répertoire de travail. Recherchez des lignes similaires à celles-ci :
+
+bash
+Copy code
+nginx: configuration file /etc/nginx/nginx.conf
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+Ici, le chemin du fichier de configuration est /etc/nginx/nginx.conf, et le répertoire de travail sera basé sur le chemin du fichier de configuration.
+
+Vérifier le fichier de configuration :
+
+Vous pouvez également ouvrir le fichier de configuration Nginx (nginx.conf) avec un éditeur de texte pour vérifier le répertoire de travail. Recherchez une directive comme worker_processes ou des déclarations server pour obtenir des indices sur le répertoire de travail.
+
+Gardez à l'esprit que la configuration de Nginx peut varier en fonction de l'installation et de la distribution Linux que vous utilisez. Les fichiers de configuration principaux peuvent également être divisés en plusieurs fichiers inclus. Assurez-vous de consulter la documentation de votre système pour des détails spécifiques à votre installation.
+
+
+Cela crée une relation entre l'adresse IP (ou le nom de domaine) et le chemin vers les fichiers du site. Assurez-vous d'ajuster ces valeurs en fonction de votre configuration et de vos besoins spécifiques.

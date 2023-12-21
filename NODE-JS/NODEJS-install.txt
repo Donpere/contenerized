@@ -1,0 +1,27 @@
+NODE JS installation
+
+vérifier les versions de node et npm : shell
+node -v
+
+npm -v
+
+Créer le package.json. Ouvir un terminal dans le dossier :
+npm init
+
+Faire entrer jusqu'à installation (yes) final. On remplira éventuellement dans le fichier par la suite.
+
+Le fichier contiendra : 
+{
+  "name": "le-dossier-que-vous-avez-créé",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
+
+On va installer deux nouveaux package en même temps : express (pour créer les requêtes) et nodemon (pour relancer le serveur en production, à chaque modif, en tâche de fond) :
+npm install (ou i) express nodemon

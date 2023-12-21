@@ -1,0 +1,106 @@
+TUTO NGINX : 
+https://grafikart.fr/tutoriels/nginx-692
+https://www.youtube.com/watch?v=YD_exb9aPZU&t=2s
+
+À PROPOS DE CE TUTORIEL
+------------------------------------------------------------------------------------
+Le principal but de notre serveur est d'héberger des sites web. Pour cela on a besoin d'installer un serveur HTTP qui va être capable de comprendre les requêtes faites par le navigateur et de renvoyer les bonnes informations en fonction. Dans ce chapitre nous allons voir l'installation de nginx.
+
+POURQUOI NGINX ?
+------------------------------------------------------------------------------------
+Nginx a été conçu conçu pour répondre au problème C10K où le but est d'être capable de répondre à plus de 10 000 reqêtes simultanées. Nginx est du coup plus performant lors d'un traffic important avec un système de worker. Là ou apache crée un processus par connexion, nginx lance une série de workers qui vont chacun être capable de gérer de multiples connexions d'une manière non bloquante.
+
+INSTALLATION
+------------------------------------------------------------------------------------
+L'installation se fait très simplement et se fait via le gestionnaire de paquet. Si vous le souhaitez vous pouvez mettre à jour la liste de vos dépôt pour intégrer les dépôts nginx.org.
+
+sudo apt-get install nginx
+Si vous essayez de vous rendre sur votre serveur après avoir installé Nginx vous devriez déjà voir une page s'afficher. Cette page se trouve dans le dossier /usr/share/nginx/html.
+
+CONFIGURATION
+------------------------------------------------------------------------------------
+La configuration de nginx est morcelée en plusieurs fichiers pour s'y retrouver plus facilement et se trouve dans le dossier /etc/nginx.
+
+- - - - - - - - - - - - - - - -
+┌──(ghost㉿ghost)-[~]
+└─$ ls /etc/nginx/              
+conf.d          koi-utf     modules-available  proxy_params     sites-enabled  win-utf
+fastcgi.conf    koi-win     modules-enabled    scgi_params      snippets
+fastcgi_params  mime.types  nginx.conf         sites-available  uwsgi_params
+                                                                                            
+┌──(ghost㉿ghost)-[~]
+└─$ 
+- - - - - - - - - - - - - - - -
+
+nginx.conf, contient la configuration générale
+conf.d/.conf (ou sites-enabled/.conf suivant votre installation), contient la configuration des différents "servers"
+
+LES VIRUTAL HOSTS
+------------------------------------------------------------------------------------
+Les hôtes virtuels permettent à Nginx de gérer plusieurs arborescences Web en simultanées. Si vous regardez dans le dossier conf.d vous remarquerez que vous n'avez pour le moment qu'une configuration qui est la configuration par défaut.
+
+server {
+    listen 80;
+    server_name localhost;
+
+    location / {
+        root /usr/share/nginx/html;
+        index index.html index.htm;
+    }
+
+    error_page 500 502 503 504  /50x.html;
+    location = /50x.html {
+        root /usr/share/nginx/html; 
+    }
+}
+
+Dans notre cas nous souhaitons faire pointer monsupersite.fr vers notre serveur, nous allons devoir créer un nouveau virtual host :
+
+server {
+
+    listen 80;
+    server_name monsupersite.fr;
+
+    # Les urls commençant par / (toutes les urls)
+    location / {
+        root /home/dev/www;
+        index index.html index.htm;
+        try_files $uri $uri/ $uri.html =404;
+    }
+
+    # Les urls contennant /. (dotfiles)
+    location ~ /\. {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
+
+    # On va placer les logs dans un dossier accessible
+    error_log /home/dev/logs/error.log; 
+    access_log /home/dev/logs/acess.log; 
+
+    # Les pages d'erreurs
+    error_page 404 500 501 /error.html;
+
+}
+
+server {
+    # On redirige les www. vers la version sans www
+    listen 80;
+    server_name www.monsupersite.fr;
+    return 301 http://monsupersite.fr$request_uri;
+}
+
+REDEMARRER POUR IMPLEMENTER LES MODIFICATIONS :
+------------------------------------------------------------------------------------
+Une fois ces modifications effectuées il ne faut pas oublier de recharger la configuration en redémarrant nginx.
+
+# Pour tester la configuration
+sudo nginx -t
+
+# Pour recharger la configuration
+sudo service nginx restart
+
+# ou 
+sudo systemctl restart nginx
+
